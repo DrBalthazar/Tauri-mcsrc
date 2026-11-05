@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+group = 'com.mcsrc'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.vineflower:vineflower:1.12.0'
+    implementation 'com.google.code.gson:gson:2.11.0'
+}
+
+application {
+    mainClass = 'com.mcsrc.sidecar.Main'
+}
+
+shadowJar {
+    archiveBaseName = 'mcsrc-sidecar'
+    archiveClassifier = ''
+    archiveVersion = ''
+    manifest {
+        attributes 'Main-Class': 'com.mcsrc.sidecar.Main'
+    }
+    mergeServiceFiles()
+}
+
+build.dependsOn shadowJar
