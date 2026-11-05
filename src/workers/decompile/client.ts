@@ -103,8 +103,8 @@ export async function decompileClass(className: ClassName, jar: Jar, version: Ve
 
     const allClasses: ClassName[] = Object.keys(jar.entries)
         .filter(p => p.endsWith('.class'))
-        .map(p => p.slice(0, -6)); // حذف .class
-
+        .map(p => p.slice(0, -6) as ClassName); // حذف .class
+        
     // ۱. سعی کن از cache بخون
     try {
         const source = await readSource(versionString, className);

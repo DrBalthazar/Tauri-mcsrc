@@ -41,7 +41,8 @@ function buildClassMap(allClasses: ClassName[]): Map<string, ClassName> {
         if (simple.includes('$')) {
             const outerSimple = simple.split('$')[0];
             // این mapping رو بازنویسی نکن
-            if (!map.has(outerSimple)) map.set(outerSimple, fqn.split('$')[0]);
+            if (!map.has(outerSimple)) map.set(outerSimple, fqn.split('$')[0] as ClassName);
+
         }
     }
     return map;
@@ -80,11 +81,11 @@ function findCurrentClassName(source: string, packageName: string): ClassName {
     // اولین کلاس/interface/enum/record بعد از import ها
     const classRegex = /^\s*(?:public\s+|private\s+|protected\s+|static\s+|abstract\s+|final\s+|sealed\s+|non-sealed\s+)*(class|interface|enum|record|@interface)\s+(\w+)/m;
     const match = source.match(classRegex);
-    if (!match) return 'Unknown';
+    if (!match) return 'Unknown' as ClassName;
 
     const simpleName = match[2];
     const pkg = packageName.replace(/\./g, '/');
-    return pkg ? `${pkg}/${simpleName}` : simpleName;
+    return (pkg ? `${pkg}/${simpleName}` : simpleName) as ClassName;
 }
 
 /**
