@@ -2,6 +2,9 @@ use serde_json::{json, Value};
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
 pub struct SidecarProcess {
     child: Child,
     stdin: ChildStdin,
@@ -11,12 +14,16 @@ pub struct SidecarProcess {
 
 impl SidecarProcess {
     pub fn spawn(java_path: &str, jar_path: &str) -> std::io::Result<Self> {
-        let mut child = Command::new(java_path)
-            .args(["-jar", jar_path])
+        let mut cmd = Command::new(java_path);
+        cmd.args(["-jar", jar_path])
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
-            .spawn()?;
+            .stderr(Stdio::null()); // لاگ‌های جاوا را کلاً خفه می‌کنیم تا به کنسول نرود
+
+        #[cfg(target_os = "windows")]
+        cmd.creation_flags(0x08000000); // 0x08000000 همان CREATE_NO_WINDOW است
+
+        let mut child = cmd.spawn()?;
 
         let stdin = child.stdin.take().expect("stdin piped");
         let stdout = BufReader::new(child.stdout.take().expect("stdout piped"));
